@@ -4,7 +4,7 @@ use strict;
 $| = 1;
 
 my $browser = "(?:Firefox|opera|plugin-container|xbmc.bin)";
-#my $browser = "(?:Firefox|opera|chrome|chromium)";
+#my $browser = "(?:Firefox|opera|plugin-container|xbmc.bin|google-chrome|chromium)";
 my $LAST_NET_ACTIVE_WINDOW = 0;
 my $LAST_NET_WM_WINDOW_TYPE_DIALOG = 0;
 my $LAST_NET_ACTIVE_WINDOW_PPID = 0;
@@ -31,22 +31,24 @@ MAIN: while (<XPROP>){
         $LAST_NET_ACTIVE_WINDOW = $_;
         print "LAST_NET_ACTIVE_WINDOW: $LAST_NET_ACTIVE_WINDOW\n";
         #print $NET_ACTIVE_WINDOW_PROPERTIES[1];
-        if ( $LAST_NET_ACTIVE_WINDOW =~ "^0x" ) {
-          print "SIGSTOP sent to: \n";
-          foreach my $LAST_NET_ACTIVE_WINDOW_CHILDPID (@LAST_NET_ACTIVE_WINDOW_CHILDPID) {
-            #Don't kill itself
-            if ($LAST_NET_ACTIVE_WINDOW_CHILDPID != 0 ) {
-              print "$LAST_NET_ACTIVE_WINDOW_CHILDPID\n";
-              system qq(kill -SIGSTOP $LAST_NET_ACTIVE_WINDOW_CHILDPID);
-              print `ps $PS_OPTS $LAST_NET_ACTIVE_WINDOW_CHILDPID`; 
-            }
-          }
-            #Don't kill itself
-            if ($LAST_NET_ACTIVE_WINDOW_PPID != 0 ) {
-              system qq(kill -SIGSTOP $LAST_NET_ACTIVE_WINDOW_PPID);
-              print `ps $PS_OPTS $LAST_NET_ACTIVE_WINDOW_PPID`; 
-            }
-        }
+        #if ( $LAST_NET_ACTIVE_WINDOW =~ "^0x" ) {
+        #  print "1 SIGSTOP sent to: \n";
+        #  foreach my $LAST_NET_ACTIVE_WINDOW_CHILDPID (@LAST_NET_ACTIVE_WINDOW_CHILDPID) {
+        #    #Don't kill itself
+        #    if ($LAST_NET_ACTIVE_WINDOW_CHILDPID != 0 ) {
+        #      print "$LAST_NET_ACTIVE_WINDOW_CHILDPID\n";
+        #      kill 'SIGSTOP', $LAST_NET_ACTIVE_WINDOW_CHILDPID;
+        #      print `ps $PS_OPTS $LAST_NET_ACTIVE_WINDOW_CHILDPID`; 
+        #      $LAST_NET_ACTIVE_WINDOW_PPID = 0;
+        #    }
+        #  }
+        #    #Don't kill itself
+        #    if ($LAST_NET_ACTIVE_WINDOW_PPID != 0 ) {
+        #      kill 'SIGSTOP', $LAST_NET_ACTIVE_WINDOW_PPID;
+        #      print `ps $PS_OPTS $LAST_NET_ACTIVE_WINDOW_PPID`; 
+        #      @LAST_NET_ACTIVE_WINDOW_CHILDPID = 0;
+        #    }
+        #}
 
         my $PPID = $NET_ACTIVE_WINDOW_PROPERTIES[1];
         #print $PPID ."\n";
@@ -58,10 +60,10 @@ MAIN: while (<XPROP>){
 
         print "SIGCONT sent to: \n";
         foreach my $CHILDPID (@CHILDPID) {
-          system qq(kill -SIGCONT $CHILDPID);
+          kill 'SIGCONT', $CHILDPID;
           print `ps $PS_OPTS $CHILDPID`; 
         }
-        system qq(kill -SIGCONT $PPID);
+        kill 'SIGCONT', $PPID;
         print `ps $PS_OPTS $PPID`; 
         print "\n";
         print $NET_ACTIVE_WINDOW_PROPERTIES[2] . "\n";
@@ -73,7 +75,7 @@ MAIN: while (<XPROP>){
           $LAST_NET_WM_WINDOW_TYPE_DIALOG = 0;
         }
   } else {
-    audio_check();
+    #audio_check();
 
     #Opera crash dialog
     if ( $LAST_NET_WM_WINDOW_TYPE_DIALOG == 1 ) {
@@ -87,10 +89,10 @@ MAIN: while (<XPROP>){
     if ( $LAST_NET_ACTIVE_WINDOW =~ "^0x" && $_ !~ $LAST_NET_ACTIVE_WINDOW) {
         print "SIGSTOP sent to: \n";
         foreach my $LAST_NET_ACTIVE_WINDOW_CHILDPID (@LAST_NET_ACTIVE_WINDOW_CHILDPID) {
-          system qq(kill -SIGSTOP $LAST_NET_ACTIVE_WINDOW_CHILDPID);
+          kill 'SIGSTOP', $LAST_NET_ACTIVE_WINDOW_CHILDPID;
           print `ps $PS_OPTS $LAST_NET_ACTIVE_WINDOW_CHILDPID`; 
         }
-        system qq(kill -SIGSTOP $LAST_NET_ACTIVE_WINDOW_PPID);
+        kill 'SIGSTOP', $LAST_NET_ACTIVE_WINDOW_PPID;
         print `ps $PS_OPTS $LAST_NET_ACTIVE_WINDOW_PPID`; 
         $LAST_NET_ACTIVE_WINDOW = 0;
         $LAST_NET_ACTIVE_WINDOW_PPID = 0;
